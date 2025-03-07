@@ -33,7 +33,9 @@
         "ChatTypeInfo",
         "DEFAULT_CHAT_FRAME",
         "AbbreviateLargeNumbers",
-        "VExRT"
+        "VExRT",
+        "trigger",
+        "WeakAuras"
     ],
     "Lua.workspace.ignoreDir": [".vscode"],
     "Lua.diagnostics.ignoredFiles": "Disable",

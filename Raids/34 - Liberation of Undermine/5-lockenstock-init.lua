@@ -61,3 +61,7 @@ aura_env.AssignSoaker = function()
         end
     end
 end
+
+aura_env.EmoteShrapnel = function(name)
+    Emit("e=" .. name .. " triggered a Foot-Blaster!")
+end
