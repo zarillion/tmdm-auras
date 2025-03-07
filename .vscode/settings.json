@@ -29,10 +29,15 @@
         "~\\.vscode\\extensions\\ketho.wow-api-0.18.2\\Annotations"
     ],
     "Lua.diagnostics.globals": [
+        "aura_env",
         "ChatTypeInfo",
         "DEFAULT_CHAT_FRAME",
-        "AbbreviateLargeNumbers"
+        "AbbreviateLargeNumbers",
+        "VExRT"
     ],
     "Lua.workspace.ignoreDir": [".vscode"],
-    "Lua.diagnostics.ignoredFiles": "Disable"
+    "Lua.diagnostics.ignoredFiles": "Disable",
+    "Lua.diagnostics.disable": [
+        "duplicate-set-field"
+    ]
 }
