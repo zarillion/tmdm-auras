@@ -364,8 +364,8 @@ if RCLootCouncil then
         RCLootCouncil._GetML = RCLootCouncil._GetML or RCLootCouncil.GetML
         RCLootCouncil.GetML = function(self)
             local Player = RCLootCouncil.Require("Data.Player")
-            isMasterLooter = (UnitName("player") == masterLooterName)
-            masterLooter = Player:Get(RCLootCouncil:UnitName(masterLooterName))
+            local isMasterLooter = (UnitName("player") == masterLooterName)
+            local masterLooter = Player:Get(RCLootCouncil:UnitName(masterLooterName))
             return isMasterLooter, masterLooter
         end
     elseif RCLootCouncil._GetML then

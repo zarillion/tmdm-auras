@@ -50,6 +50,10 @@ local function colorize(name, upper)
     return string.format("|c%s%s|r", color, name)
 end
 
+local function UnitDebuff(unit, spell)
+    return AuraUtil.FindAuraByName(spell, unit, "HARMFUL")
+end
+
 --------------------------------------------------------------------------------
 
 local DBM_OPTIONS = {
@@ -71,23 +75,23 @@ local DBM_OPTIONS = {
 
 aura_env.setDBMOptions = function()
     for option, value in pairs(DBM_OPTIONS) do
-        SendAddonMessage(PREFIX, "bm=2092:" .. option .. "=" .. tostring(value), "RAID")
+        C_ChatInfo.SendAddonMessage(PREFIX, "bm=2092:" .. option .. "=" .. tostring(value), "RAID")
     end
 end
 
 --------------------------------------------------------------------------------
 
-local GIFT_OF_THE_SKY = select(3, GetSpellInfo(258646))
-local GIFT_OF_THE_SEA = select(3, GetSpellInfo(258647))
+local GIFT_OF_THE_SKY = select(3, C_Spell.GetSpellInfo(258646))
+local GIFT_OF_THE_SEA = select(3, C_Spell.GetSpellInfo(258647))
 
 aura_env.warnGiftSky = function(name)
     local texture = "|T" .. GIFT_OF_THE_SKY .. ":0|t"
-    SendAddonMessage(PREFIX, "m=" .. texture .. " LEFT " .. texture, "WHISPER", name)
+    C_ChatInfo.SendAddonMessage(PREFIX, "m=" .. texture .. " LEFT " .. texture, "WHISPER", name)
 end
 
 aura_env.warnGiftSea = function(name)
     local texture = "|T" .. GIFT_OF_THE_SEA .. ":0|t"
-    SendAddonMessage(PREFIX, "m=" .. texture .. " RIGHT " .. texture, "WHISPER", name)
+    C_ChatInfo.SendAddonMessage(PREFIX, "m=" .. texture .. " RIGHT " .. texture, "WHISPER", name)
 end
 
 --------------------------------------------------------------------------------
@@ -141,7 +145,7 @@ local function notifySoulblight(number, soulblight)
     msg = msg .. "\n" .. (SOULBLIGHT_INFO[number] or "YOLO")
     local data = "m=" .. msg .. ";c=" .. chat .. ";d=" .. duration
     SetRaidTarget(soulblight.target, markID)
-    SendAddonMessage(PREFIX, data, "WHISPER", soulblight.target)
+    C_ChatInfo.SendAddonMessage(PREFIX, data, "WHISPER", soulblight.target)
 end
 
 local function notifySoulblightEscort(number, soulblight)
@@ -149,7 +153,7 @@ local function notifySoulblightEscort(number, soulblight)
     local mark = SOULBLIGHT_MARKS[(number - 1) % 4 + 1][1]
     local msg = "ESCORT " .. colorize(soulblight.target, true) .. " (" .. number .. ")"
     local data = "m={" .. mark .. "} " .. msg .. " {" .. mark .. "};s=bikehorn;d=" .. duration
-    SendAddonMessage(PREFIX, data, "WHISPER", soulblight.escort)
+    C_ChatInfo.SendAddonMessage(PREFIX, data, "WHISPER", soulblight.escort)
 end
 
 aura_env.soulblightNum = 0
@@ -216,12 +220,12 @@ local function notifySentenceBreak(name, count)
     if UnitDebuff(name, "Sargeras' Fear") then
         msg = msg .. ";c=YELL ESCORT ME!!"
     end
-    SendAddonMessage(PREFIX, msg, "WHISPER", name)
+    C_ChatInfo.SendAddonMessage(PREFIX, msg, "WHISPER", name)
 end
 
 local function notifySentenceHold(name)
     local msg = "m=|cffff0000DON'T BREAK!|r;d=15"
-    SendAddonMessage(PREFIX, msg, "WHISPER", name)
+    C_ChatInfo.SendAddonMessage(PREFIX, msg, "WHISPER", name)
 end
 
 local function getSentencePriority(name, count)
@@ -261,7 +265,12 @@ aura_env.assignSentence = function(name)
         end
 
         if UnitInParty("Promise") then -- notify wife
-            SendAddonMessage(PREFIX, "s=airhorn;c=YELL 2 CHAINZ - Watch Out (Explicit)!", "WHISPER", "Promise")
+            C_ChatInfo.SendAddonMessage(
+                PREFIX,
+                "s=airhorn;c=YELL 2 CHAINZ - Watch Out (Explicit)!",
+                "WHISPER",
+                "Promise"
+            )
         end
     end
 end
@@ -273,7 +282,7 @@ aura_env.emoteCrushingFear = function(name, stacks)
     if stacks > 1 then
         message = message .. " (" .. stacks .. ")"
     end
-    SendAddonMessage(PREFIX, "e=" .. message .. "!", "RAID")
+    C_ChatInfo.SendAddonMessage(PREFIX, "e=" .. message .. "!", "RAID")
 end
 
 aura_env.emoteUnleashedRage = function(name, stacks)
@@ -281,7 +290,7 @@ aura_env.emoteUnleashedRage = function(name, stacks)
     if stacks > 1 then
         message = message .. " (" .. stacks .. ")"
     end
-    SendAddonMessage(PREFIX, "e=" .. message .. "!", "RAID")
+    C_ChatInfo.SendAddonMessage(PREFIX, "e=" .. message .. "!", "RAID")
 end
 
 aura_env.emoteEmberOfRage = function(name, stacks)
@@ -289,7 +298,7 @@ aura_env.emoteEmberOfRage = function(name, stacks)
     if stacks > 1 then
         message = message .. " (" .. stacks .. ")"
     end
-    SendAddonMessage(PREFIX, "e=" .. message .. "!", "RAID")
+    C_ChatInfo.SendAddonMessage(PREFIX, "e=" .. message .. "!", "RAID")
 end
 
 --------------------------------------------------------------------------------

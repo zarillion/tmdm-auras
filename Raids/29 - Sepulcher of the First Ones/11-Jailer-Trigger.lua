@@ -1,8 +1,8 @@
-function (event, ...)
+trigger = function(event, ...)
     local aura_env = aura_env
 
-    local function Emit (message, target)
-        C_ChatInfo.SendAddonMessage('TMDM_ECWAv1', message, 'WHISPER', target)
+    local function Emit(message, target)
+        C_ChatInfo.SendAddonMessage("TMDM_ECWAv1", message, "WHISPER", target)
     end
 
     if event == "ENCOUNTER_START" and ... then
@@ -23,20 +23,20 @@ function (event, ...)
 
                 aura_env.sides = {
                     [1] = { --default
-                        [1] = {"FRONT", 1},
-                        [2] = {"LEFT", 2},
-                        [3] = {"RIGHT", 3},
-                        [4] = {"BACK CENTER", 5},
-                        [5] = {"BACK RIGHT", 6},
-                        [6] = {"BACK LEFT", 4},
+                        [1] = { "FRONT", 1 },
+                        [2] = { "LEFT", 2 },
+                        [3] = { "RIGHT", 3 },
+                        [4] = { "BACK CENTER", 5 },
+                        [5] = { "BACK RIGHT", 6 },
+                        [6] = { "BACK LEFT", 4 },
                     },
                     [2] = { --priority
-                        [1] = {"FRONT", 1},
-                        [2] = {"LEFT", 2},
-                        [3] = {"BACK LEFT", 4},
-                        [4] = {"BACK CENTER", 5},
-                        [5] = {"RIGHT", 3},
-                        [6] = {"BACK RIGHT", 6},
+                        [1] = { "FRONT", 1 },
+                        [2] = { "LEFT", 2 },
+                        [3] = { "BACK LEFT", 4 },
+                        [4] = { "BACK CENTER", 5 },
+                        [5] = { "RIGHT", 3 },
+                        [6] = { "BACK RIGHT", 6 },
                     },
                 }
 
@@ -45,18 +45,18 @@ function (event, ...)
                 aura_env.priority = {}
 
                 C_Timer.After(0.2, function()
-                        WeakAuras.ScanEvents("DAMNATION_CHECK", true)
+                    WeakAuras.ScanEvents("DAMNATION_CHECK", true)
                 end)
             end
 
             local i = UnitInRaid(destName)
-            local unit = i and "raid"..i
+            local unit = i and "raid" .. i
             if unit then
                 local combatType = aura_env.check(unit)
                 combatType = combatType or "r"
 
                 if aura_env.list[unit] then
-                    table.insert(aura_env.priority, {unit, destName, combatType, aura_env.list[unit]})
+                    table.insert(aura_env.priority, { unit, destName, combatType, aura_env.list[unit] })
 
                     local toDelete = aura_env.sides[2][aura_env.count][1]
                     for k, v in ipairs(aura_env.sides[1]) do
@@ -68,14 +68,17 @@ function (event, ...)
 
                     aura_env.count = aura_env.count + 1
                 else
-                    table.insert(aura_env.standard, {unit, destName, combatType})
+                    table.insert(aura_env.standard, { unit, destName, combatType })
                 end
             end
         end
-
     elseif event == "DAMNATION_CHECK" then
-        table.sort(aura_env.standard, function(a, b) return a[3] < b[3] end) --melee 1st
-        table.sort(aura_env.priority, function(a, b) return a[4] < b[4] end) --MRT note priority
+        table.sort(aura_env.standard, function(a, b)
+            return a[3] < b[3]
+        end) --melee 1st
+        table.sort(aura_env.priority, function(a, b)
+            return a[4] < b[4]
+        end) --MRT note priority
 
         local standard = aura_env.sides[1]
         local priority = aura_env.sides[2]
@@ -86,7 +89,7 @@ function (event, ...)
             [3] = "Player3",
             [4] = "Player4",
             [5] = "Player5",
-            [6] = "Player6"
+            [6] = "Player6",
         }
 
         for i, data in ipairs(aura_env.priority) do
@@ -94,8 +97,10 @@ function (event, ...)
             if unit then
                 local side, pattern = priority[i][1], priority[i][2]
                 players[pattern] = destName
-                Emit("m=JUMP "..side.."!;s=bikehorn;d=6;c=YELL "..side, destName)
-                C_Timer.After(3, function () Emit("c=YELL "..side, destName) end)
+                Emit("m=JUMP " .. side .. "!;s=bikehorn;d=6;c=YELL " .. side, destName)
+                C_Timer.After(3, function()
+                    Emit("c=YELL " .. side, destName)
+                end)
                 print("priority", i, unit, destName, side, pattern)
             end
         end
@@ -105,14 +110,15 @@ function (event, ...)
             if unit then
                 local side, pattern = standard[i][1], standard[i][2]
                 players[pattern] = destName
-                Emit("m=JUMP "..side.."!;s=bikehorn;d=6;c=YELL "..side, destName)
-                C_Timer.After(3, function () Emit("c=YELL "..side, destName) end)
+                Emit("m=JUMP " .. side .. "!;s=bikehorn;d=6;c=YELL " .. side, destName)
+                C_Timer.After(3, function()
+                    Emit("c=YELL " .. side, destName)
+                end)
                 print("standard", i, unit, destName, side, pattern)
             end
         end
 
-        print(strjoin(';', unpack(players)))
-        C_ChatInfo.SendAddonMessage("TMDM_DAMNATION", strjoin(';', unpack(players)), "RAID")
+        print(strjoin(";", unpack(players)))
+        C_ChatInfo.SendAddonMessage("TMDM_DAMNATION", strjoin(";", unpack(players)), "RAID")
     end
 end
-

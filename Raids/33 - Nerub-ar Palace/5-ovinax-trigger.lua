@@ -1,16 +1,18 @@
-function (event, ...)
+trigger = function(event, ...)
     local aura_env = aura_env
 
-    local function Emit (message, target)
-        C_ChatInfo.SendAddonMessage('TMDM_ECWAv1', message, 'WHISPER', target)
+    local function Emit(message, target)
+        C_ChatInfo.SendAddonMessage("TMDM_ECWAv1", message, "WHISPER", target)
     end
 
-    local function AssignDosages ()
-        if #aura_env.dosages == 0 then return end
+    local function AssignDosages()
+        if #aura_env.dosages == 0 then
+            return
+        end
 
         local unassigned = {}
 
-        local function AssignLocked (player)
+        local function AssignLocked(player)
             for marker, locks in pairs(aura_env.locked) do
                 for i, lock in ipairs(locks) do
                     if lock == player then
@@ -22,7 +24,7 @@ function (event, ...)
             table.insert(unassigned, player)
         end
 
-        local function AssignUnlocked (player)
+        local function AssignUnlocked(player)
             for marker, assignments in pairs(aura_env.assignments) do
                 if #assignments < 2 then
                     table.insert(assignments, player)
@@ -43,11 +45,13 @@ function (event, ...)
 
         -- Send out assignment messages
         for marker, assignments in pairs(aura_env.assignments) do
-            local rt = "{rt"..marker.."}"
-            SendChatMessage(rt..": "..(assignments[1] or "(none)").." "..(assignments[2] or "(none)"), "RAID")
+            local rt = "{rt" .. marker .. "}"
+            SendChatMessage(rt .. ": " .. (assignments[1] or "(none)") .. " " .. (assignments[2] or "(none)"), "RAID")
             for i, player in ipairs(assignments) do
-                Emit("c=SAY "..rt..";m="..rt.." DOSAGE "..rt..";d=8", player)
-                C_Timer.After(4, function () Emit("c=SAY {rt"..marker.."}", player) end)
+                Emit("c=SAY " .. rt .. ";m=" .. rt .. " DOSAGE " .. rt .. ";d=8", player)
+                C_Timer.After(4, function()
+                    Emit("c=SAY {rt" .. marker .. "}", player)
+                end)
             end
         end
 
@@ -72,4 +76,3 @@ function (event, ...)
         end
     end
 end
-

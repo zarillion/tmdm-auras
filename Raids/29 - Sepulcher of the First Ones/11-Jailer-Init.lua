@@ -7,20 +7,20 @@ aura_env.priority = {}
 
 aura_env.sides = {
     [1] = { --default
-        [1] = {"FRONT", 1},
-        [2] = {"LEFT", 2},
-        [3] = {"RIGHT", 3},
-        [4] = {"BACK CENTER", 5},
-        [5] = {"BACK RIGHT", 6},
-        [6] = {"BACK LEFT", 4},
+        [1] = { "FRONT", 1 },
+        [2] = { "LEFT", 2 },
+        [3] = { "RIGHT", 3 },
+        [4] = { "BACK CENTER", 5 },
+        [5] = { "BACK RIGHT", 6 },
+        [6] = { "BACK LEFT", 4 },
     },
     [2] = { --priority
-        [1] = {"FRONT", 1},
-        [2] = {"LEFT", 2},
-        [3] = {"BACK LEFT", 4},
-        [4] = {"BACK CENTER", 5},
-        [5] = {"RIGHT", 3},
-        [6] = {"BACK RIGHT", 6},
+        [1] = { "FRONT", 1 },
+        [2] = { "LEFT", 2 },
+        [3] = { "BACK LEFT", 4 },
+        [4] = { "BACK CENTER", 5 },
+        [5] = { "RIGHT", 3 },
+        [6] = { "BACK RIGHT", 6 },
     },
 }
 
@@ -129,7 +129,7 @@ aura_env.check = function(unit)
                     end
                 elseif aura_env.openraid.playerInfoManager then
                     local info = aura_env.openraid.playerInfoManager.GetPlayerInfo(name)
-                    or aura_env.openraid.playerInfoManager.GetPlayerInfo(fullname)
+                        or aura_env.openraid.playerInfoManager.GetPlayerInfo(fullname)
                     if info and info.specId and aura_env.specToType[info.specId] then
                         return aura_env.specToType[info.specId], info.specId
                     end
@@ -163,15 +163,13 @@ end
 
 aura_env.list = {}
 aura_env.MRT = function()
-    if (IsAddOnLoaded("MRT") or IsAddOnLoaded("ExRT"))
-    and _G.VExRT.Note.Text1
-    then
+    if (C_AddOns.IsAddOnLoaded("MRT") or C_AddOns.IsAddOnLoaded("ExRT")) and VExRT.Note.Text1 then
         aura_env.list = {}
         local count = 1
 
         local list = false
-        local text = _G.VExRT.Note.Text1
-        for line in text:gmatch('[^\r\n]+') do
+        local text = VExRT.Note.Text1
+        for line in text:gmatch("[^\r\n]+") do
             line = strtrim(line) --trim whitespace
             --check for start/end of the name list
             if strlower(line) == "pstart" then
@@ -183,7 +181,7 @@ aura_env.MRT = function()
             if list then
                 for name in line:gmatch("|c%x%x%x%x%x%x%x%x([^|]+)|") do
                     local i = UnitInRaid(name)
-                    local unit = i and "raid"..i
+                    local unit = i and "raid" .. i
                     if unit then
                         aura_env.list[unit] = count
                         count = count + 1
@@ -193,4 +191,3 @@ aura_env.MRT = function()
         end
     end
 end
-

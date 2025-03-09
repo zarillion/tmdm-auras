@@ -29,13 +29,19 @@
         "~\\.vscode\\extensions\\ketho.wow-api-0.18.2\\Annotations"
     ],
     "Lua.diagnostics.globals": [
+        "AbbreviateLargeNumbers",
         "aura_env",
         "ChatTypeInfo",
+        "DBM",
         "DEFAULT_CHAT_FRAME",
-        "AbbreviateLargeNumbers",
-        "VExRT",
+        "Details",
+        "RCLootCouncil",
         "trigger",
-        "WeakAuras"
+        "VExRT",
+        "WA_GetUnitBuff",
+        "WA_GetUnitDebuff",
+        "WA_IterateGroupMembers",
+        "WeakAuras",
     ],
     "Lua.workspace.ignoreDir": [".vscode"],
     "Lua.diagnostics.ignoredFiles": "Disable",
