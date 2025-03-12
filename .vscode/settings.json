@@ -41,7 +41,7 @@
         "WA_GetUnitBuff",
         "WA_GetUnitDebuff",
         "WA_IterateGroupMembers",
-        "WeakAuras",
+        "WeakAuras"
     ],
     "Lua.workspace.ignoreDir": [".vscode"],
     "Lua.diagnostics.ignoredFiles": "Disable",

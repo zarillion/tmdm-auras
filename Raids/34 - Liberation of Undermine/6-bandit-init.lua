@@ -31,9 +31,10 @@ local COMBOS = {
 
 aura_env.DisplayCombo = function(i)
     local combo = COMBOS[i] or "{skull} PUSH P2 OR DIE {skull}"
-    Emit("m2=" .. combo .. ";d=30;b=::30:1:1:.4")
+    Emit("m2=" .. combo .. ";d=15;b=::30:1:1:.4")
 end
 
 aura_env.StopDisplayCombo = function()
+    print("Stopping display ...")
     Emit("b=;m2=")
 end
