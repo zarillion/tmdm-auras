@@ -1,7 +1,8 @@
 local aura_env = aura_env
 
-aura_env.melee = {}
-aura_env.ranged = {}
+aura_env.assignments = {}
+aura_env.soaker = 0
+aura_env.set = 0
 
 local function Emit(message, target)
     if target then
@@ -15,31 +16,26 @@ local function UnitDebuff(unit, spell)
     return AuraUtil.FindAuraByName(spell, unit, "HARMFUL")
 end
 
+local function ParsePlayers(line)
+    local players = {}
+    for name in line:gmatch("|c%x%x%x%x%x%x%x%x([^|]+)|r") do
+        table.insert(players, name)
+    end
+    return players
+end
+
+--[[
+mines:
+  melee: "<playerlist>"
+  ranged: "<playerlist>"
+]]
+
 aura_env.MRT = function()
-    if C_AddOns.IsAddOnLoaded("MRT") and VExRT.Note.Text1 then
-        table.wipe(aura_env.melee)
-        table.wipe(aura_env.ranged)
-
-        local row = 0
-        local text = VExRT.Note.Text1
-
-        for line in text:gmatch("[^\r\n]+") do
-            line = strtrim(line)
-            if strlower(line) == "minestart" then
-                row = 1
-            elseif strlower(line) == "mineend" then
-                row = 0
-            elseif row == 1 then
-                for name in line:gmatch("|c%x%x%x%x%x%x%x%x([^|]+)|") do
-                    table.insert(aura_env.melee, name)
-                end
-                row = 2
-            elseif row == 2 then
-                for name in line:gmatch("|c%x%x%x%x%x%x%x%x([^|]+)|") do
-                    table.insert(aura_env.ranged, name)
-                end
-            end
-        end
+    if C_AddOns.IsAddOnLoaded("TMDMEncounterClient") then
+        local assignments = TMDM.ParseMRTNote()
+        assignments.mines.melee = ParsePlayers(assignments.mines.melee)
+        assignments.mines.ranged = ParsePlayers(assignments.mines.ranged)
+        aura_env.assignments = assignments
     end
 end
 
@@ -62,9 +58,9 @@ aura_env.AssignSoaker = function(set, soaker)
         return -- only need 4 soaks (will be called again after 4th mine)
     end
 
-    local soakers = aura_env.melee
+    local soakers = aura_env.assignments.mines.melee
     if soaker > 2 then
-        soakers = aura_env.ranged
+        soakers = aura_env.assignments.mines.ranged
     end
 
     for _, name in ipairs(soakers) do

@@ -9,7 +9,7 @@ trigger = function(event, ...)
         elseif message == "SPELL_CAST_SUCCESS" and spellID == 461060 then -- Spin To Win!
             aura_env.combo = aura_env.combo + 1
             aura_env.DisplayCombo(aura_env.combo)
-        elseif message == "SPELL_CAST_START" then -- Reward casts
+        elseif message == "SPELL_CAST_START" and srcName == "One-Armed Bandit" then -- Reward casts
             for _, spell in ipairs(aura_env.REWARDS) do
                 if spell == spellID then
                     aura_env.StopDisplayCombo()

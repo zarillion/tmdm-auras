@@ -3,12 +3,12 @@ local aura_env = aura_env
 aura_env.combo = 0
 
 aura_env.REWARDS = {
-    461101, -- Gold + Shock
-    461389, -- Gold + Flame
-    461395, -- Gold + Bomb
-    461091, -- Shock + Bomb
-    461176, -- Flame + Bomb
-    461083, -- Shock + Flame
+    464772, -- Shock + Flame
+    464801, -- Shock + Bomb
+    464804, -- Flame + Bomb
+    464806, -- Gold + Flame
+    464809, -- Gold + Shock
+    464810, -- Gold + Bomb
     465309, -- Cheat to Win!
 }
 
@@ -31,7 +31,7 @@ local COMBOS = {
 
 aura_env.DisplayCombo = function(i)
     local combo = COMBOS[i] or "{skull} PUSH P2 OR DIE {skull}"
-    Emit("m2=" .. combo .. ";d=15;b=::30:1:1:.4")
+    Emit("m2=" .. combo .. ";d=10;b=::30:1:1:.4")
 end
 
 aura_env.StopDisplayCombo = function()
