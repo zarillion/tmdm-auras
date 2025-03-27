@@ -1,12 +1,10 @@
 local aura_env = aura_env
 
-local LOR = LibStub:GetLibrary("LibOpenRaid-1.0", true)
-
 aura_env.mark = 0 -- 0-7
 aura_env.amps = {}
 aura_env.roster = {}
 
-aura_env.clickers = {
+local SPEC_ORDER = {
     253, -- Beast Mastery Hunter
     254, -- Marksmanship Hunter
     265, -- Affliction Warlock
@@ -59,23 +57,13 @@ local function Emit(message, target)
     end
 end
 
-local function IndexOf(array, value)
-    for i, v in ipairs(array) do
-        if v == value then return i end
-    end
-    return nil
+local function UnitBuff(unit, spell)
+    return AuraUtil.FindAuraByName(spell, unit, "HELPFUL")
 end
-
-local function UnitBuff(unit, spell) return AuraUtil.FindAuraByName(spell, unit, "HELPFUL") end
 
 local function UnitDebuffStacks(unit, spell)
     local _, _, stacks = AuraUtil.FindAuraByName(spell, unit, "HARMFUL")
     return stacks or 0
-end
-
-local function GetUnitSpec(unit)
-    local info = LOR.GetUnitInfo(unit)
-    if info then return info.specId end
 end
 
 local function GetBossUnit(guid)
@@ -94,17 +82,13 @@ local function IsHighHP(unit)
     return (value / total) > 0.8
 end
 
-aura_env.SortRoster = function()
+aura_env.SetRoster = function()
     table.wipe(aura_env.roster)
     for i = 1, 20 do
-        aura_env.roster[#aura_env.roster + 1] = "raid" .. i
+        aura_env.roster[#aura_env.roster + 1] = UnitGUID("raid" .. i)
     end
 
-    table.sort(aura_env.roster, function(a, b)
-        local specA = GetUnitSpec(a) or aura_env.clickers[#aura_env.clickers]
-        local specB = GetUnitSpec(b) or aura_env.clickers[#aura_env.clickers]
-        return IndexOf(aura_env.clickers, specA) < IndexOf(aura_env.clickers, specB)
-    end)
+    TMDM.SortPlayersBySpec(aura_env.roster, SPEC_ORDER)
 end
 
 aura_env.MarkAmplifier = function(guid)
@@ -122,10 +106,11 @@ end
 local TIMERS = {}
 
 local function AssignClicker()
-    for _, unit in ipairs(aura_env.roster) do
+    for _, guid in ipairs(aura_env.roster) do
+        local unit = TMDM.GUIDs[guid]
         local name = UnitName(unit)
         local elapsed = GetTime() - (TIMERS[name] or 0)
-        if name and not UnitIsDead(unit) and elapsed > 30 then
+        if name and not UnitIsDead(unit) and elapsed > 60 then
             local stacks = UnitDebuffStacks(unit, "Lingering Voltage")
             if stacks == 0 then
                 TIMERS[name] = GetTime()

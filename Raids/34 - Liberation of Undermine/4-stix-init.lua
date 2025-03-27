@@ -114,13 +114,18 @@ local function AssignSorter(name, pos, set)
 end
 
 aura_env.AssignSorters = function(set)
+    if #aura_env.sorters == 0 then return end
+
     TMDM.SortPlayersBySpec(aura_env.sorters, SPEC_ORDER)
 
+    local names = {}
     for i, guid in ipairs(aura_env.sorters) do
         local name = UnitName(TMDM.GUIDs[guid])
         AssignSorter(name, i, set)
+        table.insert(names, name)
     end
 
+    SendChatMessage("LANES: " .. strjoin(" ", unpack(names)), "RAID")
     table.wipe(aura_env.sorters)
 end
 
@@ -130,6 +135,10 @@ aura_env.WarnPowercoils = function()
         aura_env.coils[2] .. "::1:0:0:::2",
         aura_env.coils[3] .. "::1:0:0:::2",
     }
+    local players = strjoin(",", unpack(aura_env.coils))
 
     Emit("f=Zarillion,r:HEALER;d=10;g=" .. strjoin(",", unpack(glows)))
+    Emit("m=DEFENSIVES;s=bikehorn;d=10;f=" .. players)
 end
+
+TMDM.TestAssignSorter = AssignSorter

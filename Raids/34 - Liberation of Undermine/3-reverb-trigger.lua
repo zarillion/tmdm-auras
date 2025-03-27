@@ -6,7 +6,7 @@ trigger = function(event, ...)
         table.wipe(aura_env.amps)
         aura_env.SortRoster()
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-        local _, message, _, _, _, _, _, destGUID, destName, _, _, spellID = ...
+        local _, message, _, _, _, _, _, destGUID, _, _, _, spellID = ...
         if message == "SPELL_AURA_REMOVED" and spellID == 1214829 then -- Feedback Nullifier
             aura_env.MarkAmplifier(destGUID)
         end
