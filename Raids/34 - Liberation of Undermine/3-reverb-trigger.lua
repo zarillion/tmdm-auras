@@ -4,7 +4,7 @@ trigger = function(event, ...)
     if event == "ENCOUNTER_START" then
         aura_env.mark = 0
         table.wipe(aura_env.amps)
-        aura_env.SortRoster()
+        aura_env.SetRoster()
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         local _, message, _, _, _, _, _, destGUID, _, _, _, spellID = ...
         if message == "SPELL_AURA_REMOVED" and spellID == 1214829 then -- Feedback Nullifier

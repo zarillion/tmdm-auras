@@ -69,6 +69,13 @@ local SORTING_SETS = {
 -- {cross} == 1, .28, .2
 -- {moon} == .65, .78, .86
 
+local LANE_NAMES = {
+    "LEFT",
+    "MID-LEFT",
+    "MID-RIGHT",
+    "RIGHT",
+}
+
 local SORTING_LANES = {
     PURPLE = { mark = "{rt3}", r = 0.87, g = 0.36, b = 0.94 },
     GREEN = { mark = "{rt4}", r = 0, g = 0.81, b = 0 },
@@ -88,6 +95,7 @@ local function Emit(message, target)
 end
 
 local function AssignSorter(name, pos, set)
+    print(name, pos, set)
     local lane = SORTING_LANES[SORTING_SETS[set][pos]]
     local shapes = {
         TMDM.Shape({ type = "t", x = -75, y = -30, a = 0.4, scale = 1.5, angle = 2.3 }),
@@ -106,9 +114,9 @@ local function AssignSorter(name, pos, set)
         shapes[i] = shape:Serialize()
     end
 
-    local banner = "m=" .. lane.mark .. lane.mark .. lane.mark
+    local banner = "m=" .. lane.mark .. " " .. LANE_NAMES[pos] .. " LANE " .. lane.mark
     local diagram = "z=" .. strjoin(",", unpack(shapes))
-    local message = strjoin(";", banner, diagram, "d=10")
+    local message = strjoin(";", banner, diagram, "d=20")
 
     Emit(message, name)
 end

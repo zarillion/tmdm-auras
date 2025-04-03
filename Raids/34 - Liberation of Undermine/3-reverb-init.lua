@@ -79,7 +79,7 @@ end
 local function IsHighHP(unit)
     local value = UnitHealth(unit)
     local total = UnitHealthMax(unit)
-    return (value / total) > 0.8
+    return (value / total) > 0.85
 end
 
 aura_env.SetRoster = function()
@@ -130,9 +130,12 @@ aura_env.CheckAmplifier = function(unit, mark)
         local marker = "{rt" .. mark .. "}"
         local message = marker .. " CLICK " .. marker
         local chat = "CLICKING " .. marker .. "!"
-        local command = "c=YELL:" .. chat .. ";s=airhorn;m=" .. message
+        local command = "c=YELL:" .. chat .. ";s=airhorn;m1=" .. message .. ";m2=" .. message .. ";m3=" .. message
         local name = AssignClicker()
-        if name then Emit(command, name) end
+        if name then
+            SendChatMessage("CLICKING " .. marker .. " " .. name, "RAID_WARNING")
+            Emit(command, name)
+        end
     end
     state.high = isHigh
 end

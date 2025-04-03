@@ -18,7 +18,7 @@ trigger = function(event, ...)
             aura_env.AssignSoaker(aura_env.mineSet, aura_env.mineSoaker, 0)
         elseif message == "UNIT_DIED" and destName == "Unstable Crawler Mine" then
             aura_env.mineSoaker = aura_env.mineSoaker + 1
-            aura_env.AssignSoaker(aura_env.mineSet, aura_env.mineSoaker, 3)
+            aura_env.AssignSoaker(aura_env.mineSet, aura_env.mineSoaker, 2)
         end
     end
 end
