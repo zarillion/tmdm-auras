@@ -17,19 +17,19 @@ local SPEC_ORDER = { -- left to right
     251, -- Frost Death Knight
     252, -- Unholy Death Knight
 
-    253, -- Beast Mastery Hunter
-    254, -- Marksmanship Hunter
-    265, -- Affliction Warlock
-    266, -- Demonology Warlock
-    267, -- Destruction Warlock
     62, -- Arcane Mage
     63, -- Fire Mage
     64, -- Frost Mage
-    262, -- Elemental Shaman
-    258, -- Shadow Priest
-    102, -- Balance Druid
+    253, -- Beast Mastery Hunter
+    254, -- Marksmanship Hunter
     1467, -- Devastation Evoker
     1473, -- Augmentation Evoker
+    102, -- Balance Druid
+    262, -- Elemental Shaman
+    265, -- Affliction Warlock
+    266, -- Demonology Warlock
+    267, -- Destruction Warlock
+    258, -- Shadow Priest
 
     105, -- Restoration Druid
     1468, -- Preservation Evoker

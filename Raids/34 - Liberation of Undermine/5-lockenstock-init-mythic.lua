@@ -1,13 +1,20 @@
 local aura_env = aura_env
 
-local MOB = TMDM.SPECS.MOBILITY
+local RMOB = TMDM.SPECS.MOBILITY.ROLE
+local PMOB = TMDM.SPECS.MOBILITY.POSITION
 
 -- spec orders for different mines
-local MELEE_ORDER = TMDM.Concat(MOB.MELEE, MOB.RANGED, MOB.HEALER, MOB.TANK)
-local RANGED_ORDER = TMDM.Concat(MOB.RANGED, MOB.MELEE, MOB.HEALER, MOB.TANK)
-local HEALER_ORDER = TMDM.Concat(MOB.HEALER, MOB.RANGED, MOB.MELEE, MOB.TANK)
+local MELEE_ORDER = TMDM.Concat(RMOB.MELEE, RMOB.RANGED, RMOB.HEALER, RMOB.TANK)
+local RANGED_ORDER = TMDM.Concat(RMOB.RANGED, RMOB.MELEE, RMOB.HEALER, RMOB.TANK)
+local HEALER_ORDER = TMDM.Concat(RMOB.HEALER, RMOB.RANGED, RMOB.MELEE, RMOB.TANK)
+local SPECIAL_ORDER = TMDM.Concat(PMOB.RANGED, RMOB.MELEE, { 270, 65 }, RMOB.TANK)
 
 local BACKGROUND = TMDM.Shape({ type = -1, scale = 8 })
+local DIAMOND = TMDM.Shape({ type = "rt3", x = 105, y = -70 })
+local TRIANGLE = TMDM.Shape({ type = "rt4", x = -105, y = -70 })
+local SQUARE = TMDM.Shape({ type = "rt6", x = -105, y = 70 })
+local CROSS = TMDM.Shape({ type = "rt7", x = 105, y = 70 })
+local BACK = TMDM.Text({ text = "T", x = 1, y = 110 })
 
 local WIRE_TRANSFERS = {
     TMDM.Line({ x1 = -35, y1 = 10, x2 = -35, y2 = 128, thickness = 50, r = 0.5, g = 1, b = 1 }),
@@ -72,9 +79,9 @@ local FOOT_BLASTER_SETS = {
     [1] = {
         mines = {
             { pos = 3, soak = HEALER_ORDER },
-            { pos = 1, soak = HEALER_ORDER },
-            { pos = 4, soak = HEALER_ORDER },
             { pos = 2, soak = HEALER_ORDER },
+            { pos = 4, soak = HEALER_ORDER },
+            { pos = 1, soak = HEALER_ORDER },
         },
         wires = { 3, 4 },
     },
@@ -91,26 +98,26 @@ local FOOT_BLASTER_SETS = {
         mines = {
             { pos = 5, soak = MELEE_ORDER },
             { pos = 4, soak = RANGED_ORDER },
+            { pos = 2, soak = RANGED_ORDER },
             { pos = 7, soak = MELEE_ORDER },
-            { pos = 2 },
         },
     },
     -- Second phase 1
     [4] = {
         mines = {
-            { pos = 4, soak = HEALER_ORDER },
             { pos = 6, soak = RANGED_ORDER },
-            { pos = 2, soak = HEALER_ORDER },
-            { pos = 8 },
+            { pos = 8, soak = RANGED_ORDER },
+            { pos = 2, soak = MELEE_ORDER },
+            { pos = 4, soak = MELEE_ORDER },
         },
         wires = { 1, 3 },
     },
     [5] = {
         mines = {
-            { pos = 3, soak = RANGED_ORDER },
+            { pos = 1, soak = SPECIAL_ORDER },
+            { pos = 3, soak = SPECIAL_ORDER },
             { pos = 6, soak = HEALER_ORDER },
             { pos = 8, soak = HEALER_ORDER },
-            { pos = 1 },
         },
         wires = { 2, 3 },
     },
@@ -125,8 +132,8 @@ local FOOT_BLASTER_SETS = {
     -- Third phase 1
     [7] = {
         mines = {
-            { pos = 6, soak = RANGED_ORDER },
-            { pos = 8, soak = RANGED_ORDER },
+            { pos = 6, soak = SPECIAL_ORDER },
+            { pos = 8, soak = SPECIAL_ORDER },
             { pos = 1, soak = HEALER_ORDER },
             { pos = 3, soak = HEALER_ORDER },
         },
@@ -136,8 +143,8 @@ local FOOT_BLASTER_SETS = {
         mines = {
             { pos = 4, soak = HEALER_ORDER },
             { pos = 6, soak = RANGED_ORDER },
+            { pos = 8, soak = RANGED_ORDER },
             { pos = 2, soak = HEALER_ORDER },
-            { pos = 8 },
         },
         wires = { 1, 3 },
     },
@@ -164,8 +171,11 @@ local function AssignFootBlaster(group, order)
     TMDM.SortPlayersBySpec(group, order)
     for _, guid in ipairs(group) do
         local unit = TMDM.GUIDs[guid]
-        if not WA_GetUnitDebuff(unit, 1218342) then
-            local name = UnitName(unit)
+        local name = UnitName(unit)
+        local debuffed = WA_GetUnitDebuff(unit, 1218342)
+        local assigned = TMDM.Contains(aura_env.soakers, name)
+        local isDead = UnitIsDead(unit)
+        if not (debuffed or assigned or isDead) then
             table.insert(aura_env.soakers, name)
             return TMDM.Colorize(name, nil, 3)
         end
@@ -181,8 +191,10 @@ function aura_env.AssignFootBlasters(set)
     if not data then return end
 
     local lines = {}
-    local shapes = { BACKGROUND:Serialize() }
-    local texts = {}
+    local shapes =
+        { BACKGROUND:Serialize(), SQUARE:Serialize(), CROSS:Serialize(), DIAMOND:Serialize(), TRIANGLE:Serialize() }
+    local texts = {} -- BACK:Serialize() }
+    local positions = {}
 
     for i, mine in ipairs(data.mines) do
         local circle = FOOT_BLASTERS[mine.pos]
@@ -197,9 +209,12 @@ function aura_env.AssignFootBlasters(set)
             local color = circle.r == 1 and "R" or "B"
             player.text = AssignFootBlaster(group, mine.soak)
             table.insert(texts, player:Serialize())
-            SendChatMessage("Foot-Blaster: " .. mine.pos .. color .. " " .. player.text, "RAID")
+            table.insert(positions, mine.pos .. color .. "=" .. player.text)
         end
     end
+
+    print("Foot-Blaster: " .. strjoin(" ", unpack(positions)))
+    SendChatMessage("Foot-Blaster: " .. strjoin(" ", unpack(positions)), "RAID")
 
     for _, wire in ipairs(data.wires or {}) do
         table.insert(lines, WIRE_TRANSFERS[wire]:Serialize())
@@ -214,6 +229,13 @@ function aura_env.AssignFootBlasters(set)
     if #lines > 0 then table.insert(fields, "l=" .. strjoin(",", unpack(lines))) end
 
     TMDM.Emit(strjoin(";", unpack(fields)), "RAID")
+
+    -- Notify upcoming soakers with a sound
+    local soakers = {}
+    for i, soaker in ipairs(aura_env.soakers) do
+        if i > 1 and soaker ~= "" then table.insert(soakers, soaker) end
+    end
+    TMDM.Emit("s=airhorn;f=" .. strjoin(",", unpack(soakers)), "RAID")
 end
 
 TMDM.TestAssignFootBlasters = aura_env.AssignFootBlasters
@@ -242,6 +264,10 @@ function aura_env.EmoteShrapnel(name)
     TMDM.Emit("e=" .. name .. " triggered a Foot-Blaster!", "RAID")
 end
 
+function aura_env.EmoteVoidBarrage(name)
+    TMDM.Emit("e=" .. name .. " triggered a Voidsplash!", "RAID")
+end
+
 aura_env.screwups = {} -- guids targeted by screw up
 
 function aura_env.NotifyScrewUps()
@@ -261,5 +287,51 @@ function aura_env.NotifyScrewUps()
             "s=wilhelmscream",
         }
         TMDM.Emit(strjoin(";", unpack(message)), "RAID")
+    end
+end
+
+aura_env.polarizations = {}
+aura_env.swaps = {}
+aura_env.swapTimer = nil
+aura_env.first = true
+
+function aura_env.ApplyPolarization(name, spell)
+    local previous = aura_env.polarizations[name]
+    if previous and previous ~= spell then table.insert(aura_env.swaps, name) end
+    aura_env.polarizations[name] = spell
+
+    if not aura_env.swapTimer then
+        aura_env.swapTimer = C_Timer.NewTimer(0.3, function()
+            local targets = strjoin(",", unpack(aura_env.swaps))
+            TMDM.Emit("s=tmdmmoveluda;m1=MOVE BITCH;m2=SWAP SIDES NOW;f=" .. targets, "RAID")
+            table.wipe(aura_env.swaps)
+            aura_env.swapTimer = nil
+
+            if aura_env.first then
+                local reds = {}
+                local blues = {}
+                for name, spell in pairs(aura_env.polarizations) do
+                    if name ~= "Vyralea" then
+                        if spell == 1217357 then
+                            table.insert(blues, name)
+                        else
+                            table.insert(reds, name)
+                        end
+                    end
+                end
+                TMDM.Emit("m3=|cff545dffGO LEFT|r;f=" .. strjoin(",", unpack(blues)), "RAID")
+                TMDM.Emit("m3=|cffff5454GO RIGHT|r;f=" .. strjoin(",", unpack(reds)), "RAID")
+            end
+            aura_env.first = false
+        end)
+    end
+end
+
+-- helps with dead players that didn't get the generator debuff
+function aura_env.UpdatePolarization(name, spell)
+    if spell == 1216911 then -- pos
+        aura_env.polarizations[name] = 1217357
+    else -- neg
+        aura_env.polarizations[name] = 1217358
     end
 end
