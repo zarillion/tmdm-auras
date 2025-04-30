@@ -13,7 +13,7 @@ trigger = function(event, ...)
             aura_env.mineSet = aura_env.mineSet + 1
             aura_env.UpdatePolarizationGroups()
             aura_env.AssignFootBlasters(aura_env.mineSet)
-            aura_env.NotifyFootBlaster()
+            aura_env.NotifyFootBlaster(true)
         elseif message == "SPELL_AURA_APPLIED" and (spellID == 1217357 or spellID == 1217358) then -- Polarization Generator
             aura_env.ApplyPolarization(destName, spellID)
         elseif message == "SPELL_AURA_APPLIED" and (spellID == 1216911 or spellID == 1216934) then -- Polarization

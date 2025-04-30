@@ -12,29 +12,38 @@ aura_env.REWARDS = {
     465309, -- Cheat to Win!
 }
 
-local function Emit(message, target)
-    if target then
-        C_ChatInfo.SendAddonMessage("TMDMv1", message, "WHISPER", target)
-    else
-        C_ChatInfo.SendAddonMessage("TMDMv1", message, "RAID")
-    end
-end
-
 local COMBOS = {
-    "|cffee5555Flame|r + |cfffff468Gold|r",
-    "|cff5555eeShock|r + |cfffff468Gold|r",
-    "|cffee5555Flame|r + |cffc69b6dBomb|r",
-    "|cff5555eeShock|r + |cffee5555Flame|r",
-    "|cff5555eeShock|r + |cffc69b6dBomb|r",
+    "|cfffff468Gold|r + |cff5555eeShock|r",
     "|cfffff468Gold|r + |cffc69b6dBomb|r",
+    "|cffee5555Flame|r + |cffc69b6dBomb|r",
+    "|cffee5555Flame|r + |cfffff468Gold|r",
+    "|cff5555eeShock|r + |cffc69b6dBomb|r",
+    "|cff5555eeShock|r + |cffee5555Flame|r",
 }
 
 aura_env.DisplayCombo = function(i)
     local combo = COMBOS[i] or "{skull} PUSH P2 OR DIE {skull}"
-    Emit("m2=" .. combo .. ";d=10;b=::30:1:1:.4")
+    TMDM.Emit("m2=" .. combo .. ";d=20;b=::30:1:1:.4", "RAID")
 end
 
 aura_env.StopDisplayCombo = function()
-    print("Stopping display ...")
-    Emit("b=;m2=")
+    TMDM.Emit("b=;m2=", "RAID")
+end
+
+aura_env.NotifyDispel = function(name)
+    local message = {
+        "g=" .. name .. "::0:1:1:::3",
+        "f=r:HEALER,c:WARLOCK," .. name,
+        "d=15",
+    }
+    TMDM.Emit(strjoin(";", unpack(message)), "RAID")
+end
+
+aura_env.ClearDispel = function(name)
+    local message = {
+        "g=" .. name,
+        "f=r:HEALER,c:WARLOCK," .. name,
+        "d=0",
+    }
+    TMDM.Emit(strjoin(";", unpack(message)), "RAID")
 end

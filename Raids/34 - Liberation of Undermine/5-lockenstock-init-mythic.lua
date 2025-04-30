@@ -14,7 +14,6 @@ local DIAMOND = TMDM.Shape({ type = "rt3", x = 105, y = -70 })
 local TRIANGLE = TMDM.Shape({ type = "rt4", x = -105, y = -70 })
 local SQUARE = TMDM.Shape({ type = "rt6", x = -105, y = 70 })
 local CROSS = TMDM.Shape({ type = "rt7", x = 105, y = 70 })
-local BACK = TMDM.Text({ text = "T", x = 1, y = 110 })
 
 local WIRE_TRANSFERS = {
     TMDM.Line({ x1 = -35, y1 = 10, x2 = -35, y2 = 128, thickness = 50, r = 0.5, g = 1, b = 1 }),
@@ -214,7 +213,6 @@ function aura_env.AssignFootBlasters(set)
     end
 
     print("Foot-Blaster: " .. strjoin(" ", unpack(positions)))
-    SendChatMessage("Foot-Blaster: " .. strjoin(" ", unpack(positions)), "RAID")
 
     for _, wire in ipairs(data.wires or {}) do
         table.insert(lines, WIRE_TRANSFERS[wire]:Serialize())
@@ -231,11 +229,13 @@ function aura_env.AssignFootBlasters(set)
     TMDM.Emit(strjoin(";", unpack(fields)), "RAID")
 
     -- Notify upcoming soakers with a sound
-    local soakers = {}
+    local sounds = { "first", "second", "third", "fourth" }
     for i, soaker in ipairs(aura_env.soakers) do
-        if i > 1 and soaker ~= "" then table.insert(soakers, soaker) end
+        if i > 1 and soaker ~= "" then
+            local sound = "s=smc:" .. sounds[i]
+            TMDM.Emit(sound, "WHISPER", soaker)
+        end
     end
-    TMDM.Emit("s=airhorn;f=" .. strjoin(",", unpack(soakers)), "RAID")
 end
 
 TMDM.TestAssignFootBlasters = aura_env.AssignFootBlasters
@@ -243,20 +243,19 @@ TMDM.TestAssignFootBlasters = aura_env.AssignFootBlasters
 local MINE_MESSAGE = {
     "m=|T4624638:0|t SOAK MINE |T4624638:0|t",
     "c=SAY:Here I go soakin' again!",
-    "s=bikehorn",
 }
 
 local SANARC_MESSAGE = {
     "m=|T4624638:0|t SNIFF FOOT-BLASTER |T4624638:0|t",
     "c=YELL:Feet? FEET?!? FEEEEEEEEEET!!!!!",
-    "s=moan",
 }
 
-function aura_env.NotifyFootBlaster()
+function aura_env.NotifyFootBlaster(first)
     local name = table.remove(aura_env.soakers, 1)
     if name and name ~= "" then
         local message = name == "Sanarc" and SANARC_MESSAGE or MINE_MESSAGE
-        TMDM.Emit(strjoin(";", unpack(message)), "WHISPER", name)
+        local sound = first and "s=smc:first" or "s=smc:pop"
+        TMDM.Emit(strjoin(";", sound, unpack(message)), "WHISPER", name)
     end
 end
 
@@ -284,7 +283,7 @@ function aura_env.NotifyScrewUps()
         local message = {
             "f=" .. strjoin(",", unpack(baits)),
             "m3=OOK-OOK BAIT SCREW UP",
-            "s=wilhelmscream",
+            "s=smc:bait",
         }
         TMDM.Emit(strjoin(";", unpack(message)), "RAID")
     end
@@ -319,8 +318,8 @@ function aura_env.ApplyPolarization(name, spell)
                         end
                     end
                 end
-                TMDM.Emit("m3=|cff545dffGO LEFT|r;f=" .. strjoin(",", unpack(blues)), "RAID")
-                TMDM.Emit("m3=|cffff5454GO RIGHT|r;f=" .. strjoin(",", unpack(reds)), "RAID")
+                TMDM.Emit("m3=|cff545dffGO LEFT|r;s=smc:left;f=" .. strjoin(",", unpack(blues)), "RAID")
+                TMDM.Emit("m3=|cffff5454GO RIGHT|r;s=smc:right;f=" .. strjoin(",", unpack(reds)), "RAID")
             end
             aura_env.first = false
         end)
