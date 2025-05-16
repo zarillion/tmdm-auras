@@ -190,8 +190,13 @@ function aura_env.AssignFootBlasters(set)
     if not data then return end
 
     local lines = {}
-    local shapes =
-        { BACKGROUND:Serialize(), SQUARE:Serialize(), CROSS:Serialize(), DIAMOND:Serialize(), TRIANGLE:Serialize() }
+    local shapes = {
+        BACKGROUND:Serialize(),
+        SQUARE:Serialize(),
+        CROSS:Serialize(),
+        DIAMOND:Serialize(),
+        TRIANGLE:Serialize(),
+    }
     local texts = {} -- BACK:Serialize() }
     local positions = {}
 
@@ -318,8 +323,14 @@ function aura_env.ApplyPolarization(name, spell)
                         end
                     end
                 end
-                TMDM.Emit("m3=|cff545dffGO LEFT|r;s=smc:left;f=" .. strjoin(",", unpack(blues)), "RAID")
-                TMDM.Emit("m3=|cffff5454GO RIGHT|r;s=smc:right;f=" .. strjoin(",", unpack(reds)), "RAID")
+                TMDM.Emit(
+                    "m3=|cff545dffGO LEFT|r;s=smc:left;f=" .. strjoin(",", unpack(blues)),
+                    "RAID"
+                )
+                TMDM.Emit(
+                    "m3=|cffff5454GO RIGHT|r;s=smc:right;f=" .. strjoin(",", unpack(reds)),
+                    "RAID"
+                )
             end
             aura_env.first = false
         end)

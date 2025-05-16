@@ -4,58 +4,8 @@ aura_env.mark = 0 -- 0-7
 aura_env.amps = {}
 aura_env.roster = {}
 
-local SPEC_ORDER = {
-    253, -- Beast Mastery Hunter
-    254, -- Marksmanship Hunter
-    265, -- Affliction Warlock
-    266, -- Demonology Warlock
-    267, -- Destruction Warlock
-    62, -- Arcane Mage
-    63, -- Fire Mage
-    64, -- Frost Mage
-    262, -- Elemental Shaman
-    258, -- Shadow Priest
-    102, -- Balance Druid
-    1467, -- Devastation Evoker
-    1473, -- Augmentation Evoker
-
-    255, -- Survival Hunter
-    577, -- Havoc Demon Hunter
-    269, -- Windwalker Monk
-    260, -- Outlaw Rogue
-    71, -- Arms Warrior
-    72, -- Fury Warrior
-    259, -- Assassination Rogue
-    261, -- Subtlety Rogue
-    103, -- Feral Druid
-    263, -- Enhancement Shaman
-    70, -- Retribution Paladin
-    251, -- Frost Death Knight
-    252, -- Unholy Death Knight
-
-    105, -- Restoration Druid
-    1468, -- Preservation Evoker
-    256, -- Discipline Priest
-    257, -- Holy Priest
-    264, -- Restoration Shaman
-    65, -- Holy Paladin
-    270, -- Mistweaver Monk
-
-    268, -- Brewmaster Monk
-    250, -- Blood Death Knight
-    581, -- Vengeance Demon Hunter
-    66, -- Protection Paladin
-    104, -- Guardian Druid
-    73, -- Protection Warrior
-}
-
-local function Emit(message, target)
-    if target then
-        C_ChatInfo.SendAddonMessage("TMDMv1", message, "WHISPER", target)
-    else
-        C_ChatInfo.SendAddonMessage("TMDMv1", message, "RAID")
-    end
-end
+local ROLE = TMDM.SPECS.MOBILITY.ROLE
+local SPEC_ORDER = TMDM.Concat(ROLE.RANGED, ROLE.MELEE, ROLE.HEALER, ROLE.TANK)
 
 local function UnitBuff(unit, spell)
     return AuraUtil.FindAuraByName(spell, unit, "HELPFUL")
@@ -134,7 +84,7 @@ aura_env.CheckAmplifier = function(unit, mark)
         local name = AssignClicker()
         if name then
             SendChatMessage("CLICKING " .. marker .. " " .. name, "RAID_WARNING")
-            Emit(command, name)
+            TMDM.Emit(command, "WHISPER", name)
         end
     end
     state.high = isHigh

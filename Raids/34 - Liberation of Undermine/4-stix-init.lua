@@ -95,7 +95,6 @@ local function Emit(message, target)
 end
 
 local function AssignSorter(name, pos, set)
-    print(name, pos, set)
     local lane = SORTING_LANES[SORTING_SETS[set][pos]]
     local shapes = {
         TMDM.Shape({ type = "t", x = -75, y = -30, a = 0.4, scale = 1.5, angle = 2.3 }),
@@ -149,4 +148,4 @@ aura_env.WarnPowercoils = function()
     Emit("m=DEFENSIVES;s=bikehorn;d=10;f=" .. players)
 end
 
-TMDM.TestAssignSorter = AssignSorter
+TMDM.TestStix = AssignSorter

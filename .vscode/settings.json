@@ -40,6 +40,7 @@
         "trigger",
         "VExRT",
         "WA_ClassColorName",
+        "WA_GetUnitAura",
         "WA_GetUnitBuff",
         "WA_GetUnitDebuff",
         "WA_IterateGroupMembers",
