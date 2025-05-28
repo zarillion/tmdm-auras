@@ -1,5 +1,7 @@
 local aura_env = aura_env
 
+local RMOB = TMDM.SPECS.MOBILITY.ROLE
+
 --[[
 
 rescuers: "<playerlist>"
@@ -19,6 +21,11 @@ gaols:
 ]]
 
 aura_env.assignments = {}
+
+local function GUIDToName(guid)
+    local name = UnitName(TMDM.GUIDs[guid])
+    return name
+end
 
 local function ParsePlayers(line)
     local players = {}
@@ -102,7 +109,7 @@ aura_env.AssignRocket = function(rocket, name, guid)
     local soakers = {}
     for _, player in ipairs(group) do
         if player ~= guid then
-            local name = UnitName(TMDM.GUIDs[player])
+            local name = GUIDToName(player)
             table.insert(soakers, name)
         end
 
@@ -116,12 +123,11 @@ aura_env.AssignRocket = function(rocket, name, guid)
         "f=" .. strjoin(",", unpack(soakers)),
     }
 
+    if rocket == 1 then SendChatMessage("ROCKET: " .. strjoin(", ", unpack(soakers)), "RAID") end
     TMDM.Emit(strjoin(";", unpack(message)), "RAID")
 end
 
 ------------------------------ EARTHSHAKER GOAL ------------------------------
-
-aura_env.gaols = {}
 
 local GAOLS = {
     [1] = {
@@ -200,8 +206,9 @@ local GAOLS = {
     },
 }
 
-local function NotifyGaol(set, position, names)
-    local data = GAOLS[set]
+local function NotifyMap(dataset, set, position, names, type)
+    print(set, position)
+    local data = dataset[set]
     if not data then return end
 
     -- colorize our gaol vs. others
@@ -226,7 +233,7 @@ local function NotifyGaol(set, position, names)
 
     local sound = data.sounds[position]
     local title = data.positions[position]
-    local banner = title .. " GAOL"
+    local banner = title .. " " .. type
     if set > 1 then banner = banner .. " " .. title end
 
     local message = {
@@ -237,7 +244,15 @@ local function NotifyGaol(set, position, names)
         "s=" .. sound,
     }
 
+    print(strjoin(";", unpack(message)))
+    SendChatMessage(title .. ": " .. strjoin(", ", unpack(names)), "RAID")
     TMDM.Emit(strjoin(";", unpack(message)), "RAID")
+end
+
+local BACKUP_PRIO = TMDM.Concat(RMOB.MELEE, RMOB.RANGED, RMOB.HEALER, RMOB.TANK)
+
+local function NotifyGaol(set, position, names)
+    NotifyMap(GAOLS, set, position, names, "GAOL")
 end
 
 aura_env.AssignGaols = function(set, targets)
@@ -253,9 +268,9 @@ aura_env.AssignGaols = function(set, targets)
         soakers[position].gaols = 0
         for _, name in ipairs(names) do
             table.insert(soakers[position], name)
+            table.insert(assigned, UnitGUID(name))
             if TMDM.Contains(targets, UnitGUID(name)) then
                 soakers[position].gaols = soakers[position].gaols + 1
-                table.insert(assigned, UnitGUID(name))
             end
         end
     end
@@ -283,7 +298,7 @@ aura_env.AssignGaols = function(set, targets)
     -- assign leftovers
     for _, guid in ipairs(targets) do
         if not TMDM.Contains(assigned, guid) then
-            local name = UnitName(TMDM.GUIDs[guid])
+            local name = GUIDToName(guid)
             for _, names in pairs(soakers) do
                 if names.gaols == 0 then
                     table.insert(names, name)
@@ -291,31 +306,113 @@ aura_env.AssignGaols = function(set, targets)
                     break
                 end
             end
+            table.insert(assigned, guid)
+        end
+    end
+
+    -- replace dead peeps
+    local backups = {}
+    for unit in TMDM.IterateRaidMembers() do
+        if not TMDM.Contains(assigned, UnitGUID(unit)) then
+            table.insert(backups, UnitGUID(unit))
+        end
+    end
+    TMDM.SortPlayersBySpec(backups, BACKUP_PRIO)
+
+    for _, names in pairs(soakers) do
+        for i, name in ipairs(names) do
+            if UnitIsDead(name) then
+                local guid = table.remove(backups, 1)
+                names[i] = UnitName(TMDM.GUIDs[guid])
+            end
         end
     end
 
     -- send notifications
     for i, position in ipairs(GAOLS[set].positions) do
-        local names = soakers[position]
-        SendChatMessage(position .. ": " .. strjoin(", ", unpack(names)), "RAID")
-        NotifyGaol(set, i, names)
+        NotifyGaol(set, i, soakers[position])
     end
 end
 
 ----------------------------- FROSTSHATTER BOOTS -----------------------------
 
-aura_env.AssignBoots = function(set, targets) end
+local BOOTS = {
+    [1] = {
+        shapes = {
+            TMDM.Shape({ type = -2, y = 180, scale = 20, angle = 180 }),
+            TMDM.Shape({ type = "c", y = -60, r = 0.8, g = 0, b = 0, a = 0.4, scale = 3 }),
+        },
+        gaols = {
+            TMDM.Shape({ type = "c", x = -45, y = -10, a = 0.2, scale = 2.5 }),
+            TMDM.Shape({ type = "c", x = 45, y = -10, a = 0.2, scale = 2.5 }),
+        },
+        texts = {
+            TMDM.Text({ text = "L", x = -45, y = -10, size = 30 }),
+            TMDM.Text({ text = "R", x = 45, y = -10, size = 30 }),
+        },
+        positions = { "LEFT", "RIGHT" },
+        sounds = { "smc:left", "smc:right" },
+    },
+    [2] = {
+        shapes = {
+            TMDM.Shape({ type = -2, x = 90, y = -60, scale = 13, angle = 180 }),
+            TMDM.Shape({
+                type = "c",
+                x = 90,
+                y = -37,
+                r = 0.8,
+                g = 0,
+                b = 0,
+                a = 0.4,
+                scale = 2,
+            }),
+        },
+        markers = {
+            TMDM.Shape({ type = "rt8", x = 90, y = -37, scale = 0.75 }),
+            TMDM.Shape({ type = "rt6", x = -45, y = 20, scale = 0.75 }),
+            TMDM.Shape({ type = "rt4", x = 0, y = 60, scale = 0.75 }),
+            TMDM.Shape({ type = "rt3", x = 60, y = 60, scale = 0.75 }),
+        },
+        gaols = {
+            TMDM.Shape({ type = "c", x = -45, y = 20, a = 0.2, scale = 1.6 }),
+            TMDM.Shape({ type = "c", x = 0, y = 60, a = 0.2, scale = 1.6 }),
+            TMDM.Shape({ type = "c", x = 60, y = 60, a = 0.2, scale = 1.6 }),
+        },
+        positions = { "{square}", "{triangle}", "{diamond}" },
+        sounds = { "smc:06", "smc:04", "smc:03" },
+    },
+}
 
--- External assignments
+local function NotifyBoot(set, position, names)
+    NotifyMap(BOOTS, set, position, names, "WALLS")
+end
+
+-- Sort boots healer -> melee -> ranged
+local BOOT_PRIO = TMDM.Concat(RMOB.HEALER, RMOB.MELEE, RMOB.RANGED, RMOB.TANK)
+
+aura_env.AssignBoots = function(set, targets)
+    if set > 2 or #targets ~= 4 then return end
+
+    TMDM.SortPlayersBySpec(targets, BOOT_PRIO)
+
+    if set == 1 then
+        NotifyBoot(1, 1, { GUIDToName(targets[1]), GUIDToName(targets[2]) })
+        NotifyBoot(1, 2, { GUIDToName(targets[3]), GUIDToName(targets[4]) })
+    else
+        NotifyBoot(2, 3, { GUIDToName(targets[1]) })
+        NotifyBoot(2, 2, { GUIDToName(targets[2]), GUIDToName(targets[3]) })
+        NotifyBoot(2, 1, { GUIDToName(targets[4]) })
+    end
+end
+
+-------------------------------------------------------------------------------
+
+aura_env.GlowFingerGun = function(name)
+    TMDM.Emit("d=5;g=" .. name .. "::0:.5:1:::3", "RAID")
+end
+
+aura_env.GlowSpray = function(name)
+    TMDM.Emit("d=4;g=" .. name .. "::1:0:.2:::3", "RAID")
+end
+
 -- Rescue assignments
-
--- table.wipe(TMDM.GUIDs)
--- for unit in TMDM.IterateGroupMembers() do
---     TMDM.GUIDs[UnitGUID(unit)] = unit
--- end
-
--- aura_env.MRT()
--- aura_env.AssignGaols(
---     3,
---     { UnitGUID("Funnyfatguy"), UnitGUID("Pandice"), UnitGUID("Honduh"), UnitGUID("Zarillion") }
--- )
