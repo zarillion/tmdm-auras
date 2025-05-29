@@ -147,34 +147,34 @@ local GAOLS = {
         sounds = { "smc:left", "smc:right" },
     },
     [2] = {
-        shapes = {
-            TMDM.Shape({ type = -2, x = 90, y = -60, scale = 13, angle = 180 }),
-            TMDM.Shape({
-                type = "c",
-                x = 90,
-                y = -37,
-                r = 0.8,
-                g = 0,
-                b = 0,
-                a = 0.4,
-                scale = 2,
-            }),
-        },
-        markers = {
-            TMDM.Shape({ type = "rt8", x = 90, y = -37, scale = 0.75 }),
-            TMDM.Shape({ type = "rt6", x = -45, y = 20, scale = 0.75 }),
-            TMDM.Shape({ type = "rt4", x = 0, y = 60, scale = 0.75 }),
-            TMDM.Shape({ type = "rt3", x = 60, y = 60, scale = 0.75 }),
-        },
-        gaols = {
-            TMDM.Shape({ type = "c", x = -45, y = 20, a = 0.2, scale = 1.6 }),
-            TMDM.Shape({ type = "c", x = 0, y = 60, a = 0.2, scale = 1.6 }),
-            TMDM.Shape({ type = "c", x = 60, y = 60, a = 0.2, scale = 1.6 }),
-        },
-        positions = { "{square}", "{triangle}", "{diamond}" },
-        sounds = { "smc:06", "smc:04", "smc:03" },
-    },
-    [3] = {
+    --     shapes = {
+    --         TMDM.Shape({ type = -2, x = 90, y = -60, scale = 13, angle = 180 }),
+    --         TMDM.Shape({
+    --             type = "c",
+    --             x = 90,
+    --             y = -37,
+    --             r = 0.8,
+    --             g = 0,
+    --             b = 0,
+    --             a = 0.4,
+    --             scale = 2,
+    --         }),
+    --     },
+    --     markers = {
+    --         TMDM.Shape({ type = "rt8", x = 90, y = -37, scale = 0.75 }),
+    --         TMDM.Shape({ type = "rt6", x = -45, y = 20, scale = 0.75 }),
+    --         TMDM.Shape({ type = "rt4", x = 0, y = 60, scale = 0.75 }),
+    --         TMDM.Shape({ type = "rt3", x = 60, y = 60, scale = 0.75 }),
+    --     },
+    --     gaols = {
+    --         TMDM.Shape({ type = "c", x = -45, y = 20, a = 0.2, scale = 1.6 }),
+    --         TMDM.Shape({ type = "c", x = 0, y = 60, a = 0.2, scale = 1.6 }),
+    --         TMDM.Shape({ type = "c", x = 60, y = 60, a = 0.2, scale = 1.6 }),
+    --     },
+    --     positions = { "{square}", "{triangle}", "{diamond}" },
+    --     sounds = { "smc:06", "smc:04", "smc:03" },
+    -- },
+    -- [3] = {
         shapes = {
             TMDM.Shape({ type = -2, x = 30, y = -90, scale = 13, angle = -90 }),
             TMDM.Shape({
@@ -353,34 +353,34 @@ local BOOTS = {
         positions = { "LEFT", "RIGHT" },
         sounds = { "smc:left", "smc:right" },
     },
-    [2] = {
-        shapes = {
-            TMDM.Shape({ type = -2, x = 90, y = -60, scale = 13, angle = 180 }),
-            TMDM.Shape({
-                type = "c",
-                x = 90,
-                y = -37,
-                r = 0.8,
-                g = 0,
-                b = 0,
-                a = 0.4,
-                scale = 2,
-            }),
-        },
-        markers = {
-            TMDM.Shape({ type = "rt8", x = 90, y = -37, scale = 0.75 }),
-            TMDM.Shape({ type = "rt6", x = -45, y = 20, scale = 0.75 }),
-            TMDM.Shape({ type = "rt4", x = 0, y = 60, scale = 0.75 }),
-            TMDM.Shape({ type = "rt3", x = 60, y = 60, scale = 0.75 }),
-        },
-        gaols = {
-            TMDM.Shape({ type = "c", x = -45, y = 20, a = 0.2, scale = 1.6 }),
-            TMDM.Shape({ type = "c", x = 0, y = 60, a = 0.2, scale = 1.6 }),
-            TMDM.Shape({ type = "c", x = 60, y = 60, a = 0.2, scale = 1.6 }),
-        },
-        positions = { "{square}", "{triangle}", "{diamond}" },
-        sounds = { "smc:06", "smc:04", "smc:03" },
-    },
+    -- [2] = {
+    --     shapes = {
+    --         TMDM.Shape({ type = -2, x = 90, y = -60, scale = 13, angle = 180 }),
+    --         TMDM.Shape({
+    --             type = "c",
+    --             x = 90,
+    --             y = -37,
+    --             r = 0.8,
+    --             g = 0,
+    --             b = 0,
+    --             a = 0.4,
+    --             scale = 2,
+    --         }),
+    --     },
+    --     markers = {
+    --         TMDM.Shape({ type = "rt8", x = 90, y = -37, scale = 0.75 }),
+    --         TMDM.Shape({ type = "rt6", x = -45, y = 20, scale = 0.75 }),
+    --         TMDM.Shape({ type = "rt4", x = 0, y = 60, scale = 0.75 }),
+    --         TMDM.Shape({ type = "rt3", x = 60, y = 60, scale = 0.75 }),
+    --     },
+    --     gaols = {
+    --         TMDM.Shape({ type = "c", x = -45, y = 20, a = 0.2, scale = 1.6 }),
+    --         TMDM.Shape({ type = "c", x = 0, y = 60, a = 0.2, scale = 1.6 }),
+    --         TMDM.Shape({ type = "c", x = 60, y = 60, a = 0.2, scale = 1.6 }),
+    --     },
+    --     positions = { "{square}", "{triangle}", "{diamond}" },
+    --     sounds = { "smc:06", "smc:04", "smc:03" },
+    -- },
 }
 
 local function NotifyBoot(set, position, names)
