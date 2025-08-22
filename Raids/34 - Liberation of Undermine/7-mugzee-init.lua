@@ -4,14 +4,9 @@ local RMOB = TMDM.SPECS.MOBILITY.ROLE
 
 --[[
 
-rescuers: "<playerlist>"
 gaols:
-  - LEFT: "<playerlist>"
-    RIGHT: "<playerlist>"
-
   - '{square}': "<playerlist>"
     '{triangle}': "<playerlist>"
-    '{diamond}': "<playerlist>"
 
   - '{cross}': "<playerlist>"
     '{star}': "<playerlist>"
@@ -45,7 +40,6 @@ aura_env.MRT = function()
             end
         end
 
-        assignments.rescuers = ParsePlayers(assignments.rescuers)
         aura_env.assignments = assignments
     end
 end
@@ -135,46 +129,18 @@ local GAOLS = {
             TMDM.Shape({ type = -2, y = -180, scale = 20 }),
             TMDM.Shape({ type = "c", y = 60, r = 0.8, g = 0, b = 0, a = 0.4, scale = 3 }),
         },
+        markers = {
+            TMDM.Shape({ type = "rt6", x = -45, y = 10, scale = 1.17 }),
+            TMDM.Shape({ type = "rt4", x = 45, y = 10, scale = 1.17 }),
+        },
         gaols = {
             TMDM.Shape({ type = "c", x = -45, y = 10, a = 0.2, scale = 2.5 }),
             TMDM.Shape({ type = "c", x = 45, y = 10, a = 0.2, scale = 2.5 }),
         },
-        texts = {
-            TMDM.Text({ text = "L", x = -45, y = 10, size = 30 }),
-            TMDM.Text({ text = "R", x = 45, y = 10, size = 30 }),
-        },
-        positions = { "LEFT", "RIGHT" },
-        sounds = { "smc:left", "smc:right" },
+        positions = { "{square}", "{triangle}" },
+        sounds = { "smc:06", "smc:04" },
     },
     [2] = {
-    --     shapes = {
-    --         TMDM.Shape({ type = -2, x = 90, y = -60, scale = 13, angle = 180 }),
-    --         TMDM.Shape({
-    --             type = "c",
-    --             x = 90,
-    --             y = -37,
-    --             r = 0.8,
-    --             g = 0,
-    --             b = 0,
-    --             a = 0.4,
-    --             scale = 2,
-    --         }),
-    --     },
-    --     markers = {
-    --         TMDM.Shape({ type = "rt8", x = 90, y = -37, scale = 0.75 }),
-    --         TMDM.Shape({ type = "rt6", x = -45, y = 20, scale = 0.75 }),
-    --         TMDM.Shape({ type = "rt4", x = 0, y = 60, scale = 0.75 }),
-    --         TMDM.Shape({ type = "rt3", x = 60, y = 60, scale = 0.75 }),
-    --     },
-    --     gaols = {
-    --         TMDM.Shape({ type = "c", x = -45, y = 20, a = 0.2, scale = 1.6 }),
-    --         TMDM.Shape({ type = "c", x = 0, y = 60, a = 0.2, scale = 1.6 }),
-    --         TMDM.Shape({ type = "c", x = 60, y = 60, a = 0.2, scale = 1.6 }),
-    --     },
-    --     positions = { "{square}", "{triangle}", "{diamond}" },
-    --     sounds = { "smc:06", "smc:04", "smc:03" },
-    -- },
-    -- [3] = {
         shapes = {
             TMDM.Shape({ type = -2, x = 30, y = -90, scale = 13, angle = -90 }),
             TMDM.Shape({
@@ -228,7 +194,6 @@ local function NotifyMap(dataset, set, position, names, type)
 
     local display = TMDM.SerializeDisplay({
         shapes = TMDM.Concat(data.shapes, data.gaols, data.markers or {}),
-        texts = data.texts,
     })
 
     local sound = data.sounds[position]
@@ -255,8 +220,19 @@ local function NotifyGaol(set, position, names)
     NotifyMap(GAOLS, set, position, names, "GAOL")
 end
 
+local function DebugGaols(soakers)
+    for pos, names in pairs(soakers) do
+        print(pos .. ": " .. strjoin(", ", unpack(names)), names.gaols)
+    end
+end
+
 aura_env.AssignGaols = function(set, targets)
-    if #targets ~= set + 1 then return end -- wait for all targeted
+    -- only once per phase
+    if aura_env.gaoled then return end
+
+    -- Wait for correct number of targets (using phase as set)
+    if set == 1 and #targets ~= 2 then return end
+    if set == 2 and #targets ~= 4 then return end
 
     local assignments = aura_env.assignments.gaols[set]
     local soakers = {}
@@ -274,6 +250,9 @@ aura_env.AssignGaols = function(set, targets)
             end
         end
     end
+
+    print("INITIAL:")
+    DebugGaols(soakers)
 
     -- balance gaols
     for position, names in pairs(soakers) do
@@ -295,6 +274,9 @@ aura_env.AssignGaols = function(set, targets)
         end
     end
 
+    print("BALANCE:")
+    DebugGaols(soakers)
+
     -- assign leftovers
     for _, guid in ipairs(targets) do
         if not TMDM.Contains(assigned, guid) then
@@ -309,6 +291,9 @@ aura_env.AssignGaols = function(set, targets)
             table.insert(assigned, guid)
         end
     end
+
+    print("LEFTOVERS:")
+    DebugGaols(soakers)
 
     -- replace dead peeps
     local backups = {}
@@ -328,6 +313,9 @@ aura_env.AssignGaols = function(set, targets)
         end
     end
 
+    print("REPLACE DEAD:")
+    DebugGaols(soakers)
+
     -- send notifications
     for i, position in ipairs(GAOLS[set].positions) do
         NotifyGaol(set, i, soakers[position])
@@ -342,45 +330,17 @@ local BOOTS = {
             TMDM.Shape({ type = -2, y = 180, scale = 20, angle = 180 }),
             TMDM.Shape({ type = "c", y = -60, r = 0.8, g = 0, b = 0, a = 0.4, scale = 3 }),
         },
+        markers = {
+            TMDM.Shape({ type = "rt4", x = -45, y = -10, scale = 1.17 }),
+            TMDM.Shape({ type = "rt6", x = 45, y = -10, scale = 1.17 }),
+        },
         gaols = {
             TMDM.Shape({ type = "c", x = -45, y = -10, a = 0.2, scale = 2.5 }),
             TMDM.Shape({ type = "c", x = 45, y = -10, a = 0.2, scale = 2.5 }),
         },
-        texts = {
-            TMDM.Text({ text = "L", x = -45, y = -10, size = 30 }),
-            TMDM.Text({ text = "R", x = 45, y = -10, size = 30 }),
-        },
-        positions = { "LEFT", "RIGHT" },
-        sounds = { "smc:left", "smc:right" },
+        positions = { "{triangle}", "{square}" },
+        sounds = { "smc:04", "smc:06" },
     },
-    -- [2] = {
-    --     shapes = {
-    --         TMDM.Shape({ type = -2, x = 90, y = -60, scale = 13, angle = 180 }),
-    --         TMDM.Shape({
-    --             type = "c",
-    --             x = 90,
-    --             y = -37,
-    --             r = 0.8,
-    --             g = 0,
-    --             b = 0,
-    --             a = 0.4,
-    --             scale = 2,
-    --         }),
-    --     },
-    --     markers = {
-    --         TMDM.Shape({ type = "rt8", x = 90, y = -37, scale = 0.75 }),
-    --         TMDM.Shape({ type = "rt6", x = -45, y = 20, scale = 0.75 }),
-    --         TMDM.Shape({ type = "rt4", x = 0, y = 60, scale = 0.75 }),
-    --         TMDM.Shape({ type = "rt3", x = 60, y = 60, scale = 0.75 }),
-    --     },
-    --     gaols = {
-    --         TMDM.Shape({ type = "c", x = -45, y = 20, a = 0.2, scale = 1.6 }),
-    --         TMDM.Shape({ type = "c", x = 0, y = 60, a = 0.2, scale = 1.6 }),
-    --         TMDM.Shape({ type = "c", x = 60, y = 60, a = 0.2, scale = 1.6 }),
-    --     },
-    --     positions = { "{square}", "{triangle}", "{diamond}" },
-    --     sounds = { "smc:06", "smc:04", "smc:03" },
-    -- },
 }
 
 local function NotifyBoot(set, position, names)
@@ -391,7 +351,7 @@ end
 local BOOT_PRIO = TMDM.Concat(RMOB.HEALER, RMOB.MELEE, RMOB.RANGED, RMOB.TANK)
 
 aura_env.AssignBoots = function(set, targets)
-    if set > 2 or #targets ~= 4 then return end
+    if set > 1 or #targets ~= 4 then return end
 
     TMDM.SortPlayersBySpec(targets, BOOT_PRIO)
 
@@ -414,5 +374,3 @@ end
 aura_env.GlowSpray = function(name)
     TMDM.Emit("d=4;g=" .. name .. "::1:0:.2:::3", "RAID")
 end
-
--- Rescue assignments
